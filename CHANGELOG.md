@@ -2,7 +2,7 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [0.9.6] - 2026-10-22
 
 ### Added
 
@@ -122,6 +122,7 @@ First public release. Pre-1.0 interfaces and score calibration may still change.
 - English prose is the supported scope. PDF and RTF are logged but not read, and
   files written through shell commands do not pass saved-file hooks.
 
+[0.9.6]: https://github.com/seyedehsanhadi/sloptrim/releases/tag/v0.9.6
 [0.9.5]: https://github.com/seyedehsanhadi/sloptrim/releases/tag/v0.9.5
 [0.9.4]: https://github.com/seyedehsanhadi/sloptrim/releases/tag/v0.9.4
 [0.9.3]: https://github.com/seyedehsanhadi/sloptrim/releases/tag/v0.9.3
