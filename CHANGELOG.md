@@ -4,6 +4,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.9.5] - 2026-10-22
+
 ### Fixed
 
 - Curly apostrophes match like straight ones. `Let’s dive in`, `it’s worth noting` and `don’t` were missed before, and `it’s` counted as two words. Across the 341 bench documents that use `’`, the score now equals the straight-apostrophe version.
@@ -116,6 +118,7 @@ First public release. Pre-1.0 interfaces and score calibration may still change.
 - English prose is the supported scope. PDF and RTF are logged but not read, and
   files written through shell commands do not pass saved-file hooks.
 
+[0.9.5]: https://github.com/seyedehsanhadi/sloptrim/releases/tag/v0.9.5
 [0.9.4]: https://github.com/seyedehsanhadi/sloptrim/releases/tag/v0.9.4
 [0.9.3]: https://github.com/seyedehsanhadi/sloptrim/releases/tag/v0.9.3
 [0.9.2]: https://github.com/seyedehsanhadi/sloptrim/releases/tag/v0.9.2

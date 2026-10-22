@@ -50,7 +50,7 @@ repository never opens a socket, so it cannot ask the remote either. Cut it by h
 push it, or the changelog link is a 404:
 
 ```bash
-git tag -a v0.9.4 -m "sloptrim 0.9.4" && git push origin v0.9.4
+git tag -a v0.9.5 -m "sloptrim 0.9.5" && git push origin v0.9.5
 ```
 
 ## Regenerating the recorded session
