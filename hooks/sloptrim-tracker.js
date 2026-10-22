@@ -6,7 +6,7 @@ process.on('unhandledRejection', () => process.exit(0));
 const { execFileSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const { readMode, writeMode, parseStdin, LEVELS, readLedger, verdict, runDetectResult, contract, ROOT } = require('./sloptrim-lib');
+const { forcedMode, readMode, writeMode, parseStdin, LEVELS, readLedger, verdict, runDetectResult, contract, ROOT } = require('./sloptrim-lib');
 const { OFFICE_EXT, NOTEBOOK_EXT, BINARY_PROSE } = require('./sloptrim-guard');
 
 function help() {
@@ -69,11 +69,16 @@ function check(fileArg) {
   ].filter(Boolean).join('\n');
 }
 
+function forcedNote() {
+  const f = forcedMode();
+  return f ? ` (SLOPTRIM_MODE=${f} applies to this run)` : '';
+}
+
 function doctor() {
   const { DETECT, FLAG } = require('./sloptrim-lib');
   const lines = ['sloptrim doctor:'];
   const mode = readMode();
-  lines.push(`  [${mode === 'off' ? 'off' : 'OK'}] mode: ${mode}${mode === 'off' ? '  -> /sloptrim on' : ''}`);
+  lines.push(`  [${mode === 'off' ? 'off' : 'OK'}] mode: ${mode}${forcedNote() || (mode === 'off' ? '  -> /sloptrim on' : '')}`);
   lines.push(fs.existsSync(DETECT)
     ? '  [OK] detector found'
     : '  [!!] detector missing - reinstall the plugin (/plugin install sloptrim@sloptrim)');
@@ -192,10 +197,10 @@ const SELF = cmd && cmd[1] ? '/sloptrim:sloptrim' : '/sloptrim';
 if (cmd) {
   const arg = (cmd[2] || 'help').toLowerCase();
   const rest = cmd[3] || '';
-  if (arg === 'off') { writeMode('off'); block('sloptrim: off'); }
-  if (arg === 'on') { writeMode('full'); block('sloptrim: on (full)'); }
-  if (LEVELS.includes(arg)) { writeMode(arg); block(`sloptrim: level set to ${arg}`); }
-  if (arg === 'status') block(`sloptrim: ${readMode()}`);
+  if (arg === 'off') { writeMode('off'); block('sloptrim: off' + forcedNote()); }
+  if (arg === 'on') { writeMode('full'); block('sloptrim: on (full)' + forcedNote()); }
+  if (LEVELS.includes(arg)) { writeMode(arg); block(`sloptrim: level set to ${arg}` + forcedNote()); }
+  if (arg === 'status') block(`sloptrim: ${readMode()}` + forcedNote());
   if (arg === 'show') block(showLedger(input.session_id));
   if (arg === 'help') block(help());
   if (arg === 'check') block(check(rest));

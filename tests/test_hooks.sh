@@ -253,6 +253,14 @@ echo "$out" | grep -q "SLOPTRIM ACTIVE - level: strict"; check "SLOPTRIM_MODE=st
 [ "$(cat "$RUN/.sloptrim-active")" = "full" ]; check "SLOPTRIM_MODE=strict is not persisted" $?
 out="$(echo '{}' | CLAUDE_CONFIG_DIR="$RUN" SLOPTRIM_MODE=bogus node "$REPO/hooks/sloptrim-activate.js")"
 echo "$out" | grep -q "SLOPTRIM ACTIVE - level: full"; check "an unknown SLOPTRIM_MODE falls back to the saved flag" $?
+out="$(echo '{"prompt":"/sloptrim status"}' | CLAUDE_CONFIG_DIR="$RUN" SLOPTRIM_MODE=off node "$REPO/hooks/sloptrim-tracker.js")"
+echo "$out" | grep -q "SLOPTRIM_MODE=off"; check "status names SLOPTRIM_MODE when it is in force" $?
+out="$(echo '{"prompt":"/sloptrim doctor"}' | CLAUDE_CONFIG_DIR="$RUN" SLOPTRIM_MODE=off node "$REPO/hooks/sloptrim-tracker.js")"
+echo "$out" | grep -q -- "-> /sloptrim on"; [ $? -ne 0 ]; check "doctor does not offer /sloptrim on while SLOPTRIM_MODE wins" $?
+echo "$out" | grep -q "SLOPTRIM_MODE=off"; check "doctor names SLOPTRIM_MODE when it is in force" $?
+out="$(echo '{"prompt":"/sloptrim on"}' | CLAUDE_CONFIG_DIR="$RUN" SLOPTRIM_MODE=off node "$REPO/hooks/sloptrim-tracker.js")"
+echo "$out" | grep -q "SLOPTRIM_MODE=off"; check "a level change says SLOPTRIM_MODE still applies to this run" $?
+echo full > "$RUN/.sloptrim-active"
 
 node "$REPO/tests/interp.js" >/dev/null 2>&1
 check "a failing first python falls through to the next launcher" $?
