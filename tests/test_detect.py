@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 import json
+import re
 import subprocess
 import sys
 import time
@@ -186,6 +187,42 @@ def test_great_question_needs_chatbot_punctuation():
     # Flattery lives in 48 alone.
     assert "48_sycophantic" in chatbot
     assert "47_chatbot_artifacts" not in chatbot
+
+
+def test_every_documented_signpost_phrase_is_detected():
+    doc = (DETECT.parent.parent / "references" / "patterns.md").read_text(encoding="utf-8")
+    section = doc.split("### 31.", 1)[1].split("###", 1)[0]
+    watch = section.split("**Watch for:**", 1)[1].split("\n", 1)[0]
+    phrases = re.findall(r'"([^"]+)"', watch)
+    assert len(phrases) >= 10
+    missed = [p for p in phrases
+              if "31_signposting" not in run_detect(f"The report is ready. {p.capitalize()}, the numbers are below.")]
+    assert not missed, missed
+
+
+def test_curly_apostrophe_matches_like_straight():
+    text = ("It's worth noting that the report is ready. Let's dive in. I don't think "
+            "we're late, and you're right that it's fine; I can't see why they're worried.")
+    straight = run_detect(text)
+    curly = run_detect(text.replace("'", "’"))
+    assert {"20_empty_pivot_phrase", "31_signposting"} <= set(straight)
+    assert "60_curly_quotes" in curly and "60_curly_quotes" not in straight
+    keys = lambda r: {k for k in r if not k.startswith("_")} - {"60_curly_quotes"}
+    assert keys(curly) == keys(straight)
+    assert curly["_metrics"]["ai_tell_score"] == straight["_metrics"]["ai_tell_score"]
+
+
+def test_phrases_ending_in_punctuation_still_match():
+    hits = {
+        "27_compulsive_intro": ["Great news! The fix landed.", "Great news: the fix landed.",
+                                "Ever wanted to bake your own bread? Here it is."],
+        "22_authority_trope": ["Fundamentally, the model is wrong."],
+    }
+    for key, texts in hits.items():
+        for t in texts:
+            assert key in run_detect(t), (key, t)
+    # Common in human abstracts; scoring it moved real arXiv text from clean to light tells.
+    assert "27_compulsive_intro" not in run_detect("In recent years, the survey grew.")
 
 
 def run_clean(text: str) -> str:

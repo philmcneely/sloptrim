@@ -22,6 +22,6 @@ abstract: >-
   score; 12 are reported as writing advice. The runtime uses standard-library
   Python and Node.js and opens no network connection. On five public matched
   Human Detectors arms with 30 human and 30 machine articles each, its score
-  achieved ROC-AUC 0.762 to 0.946. These are ranking results, not authorship or
+  achieved ROC-AUC 0.783 to 0.943. These are ranking results, not authorship or
   per-document accuracy claims. The benchmark's pinned source, aggregate results,
   confidence intervals, and offline reproduction harness ship with the repository.

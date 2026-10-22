@@ -284,7 +284,7 @@ When challenged about whether text was AI-generated, AI-rewritten responses char
 
 ### 27. Compulsive intro hooks
 
-**Watch for:** "In today's fast-paced world,", "In a world where,", "In an era of,", "In recent years,", "More than ever before,", "We live in a time when".
+**Watch for:** "In today's fast-paced world,", "In a world where,", "In an era of,", "More than ever before,", "We live in a time when".
 
 **Before:** In today's fast-paced world, businesses need to adapt to survive.
 

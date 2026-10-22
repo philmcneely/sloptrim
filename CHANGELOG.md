@@ -4,6 +4,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Curly apostrophes match like straight ones. `Let’s dive in`, `it’s worth noting` and `don’t` were missed before, and `it’s` counted as two words. Across the 341 bench documents that use `’`, the score now equals the straight-apostrophe version.
+- Signposting catches every phrase the catalogue lists, including "bear with me", "let's unpack this" and "what follows is".
+- "Great news!", "Ever wanted to ...?" and "Fundamentally," could never match, because punctuation stood before a word boundary. They match now.
+- "In recent years," is no longer listed under compulsive intro hooks. It never matched, and turning it on lifted human research abstracts from clean to light tells.
+
+### Changed
+
+- The public benchmark was re-run with this detector. ROC-AUC moved from 0.946 to 0.943 for GPT-4o, from 0.838 to 0.832 for paraphrased GPT-4o and from 0.762 to 0.783 for humanized o1-pro; Claude 3.5 Sonnet and o1-pro are unchanged. Default flag rates (above 40) are unchanged on every arm. In strict mode (above 20), 5 of GPT-4o's 30 human articles are flagged instead of 3: one quotes a source saying "It's not just the heat, it's the flavors", the other writes "Let's break it down". Both used curly apostrophes, and their straight-apostrophe versions were already flagged before. Strict mode also catches one more humanized o1-pro article (13 of 30). The chart's paraphrased GPT-4o bar had been drawn at 0.837 and now matches its label.
+
 ## [0.9.4] - 2026-10-05
 
 ### Fixed

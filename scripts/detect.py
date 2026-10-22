@@ -165,13 +165,15 @@ AUTHORITY_TROPE = (
     r"the simple fact is|at its core|what really matters|more than anything|"
     r"at the end of the day|the bottom line is|in reality|fundamentally,|"
     r"the real question is|the heart of the matter|the deeper issue|"
-    r"when you get down to it|when all is said and done)\b"
+    r"when you get down to it|when all is said and done)(?!\w)"
 )
 
 SIGNPOSTING = (
     r"\b(?:let'?s (?:dive|delve|explore)|let'?s break (?:this|it) down|"
     r"here'?s what you need to know|without further ado|now let'?s look at|"
-    r"buckle up|stay with me|"
+    r"buckle up|stay with me|bear with me|let'?s unpack(?: this| that| it)?|"
+    r"here'?s the rundown|we'?ll get to (?:that|this) in a moment|first, some context|"
+    r"before we begin|what follows is|let'?s take a (?:closer )?look|"
     r"(?:are you )?ready to dive in(?:to)?)\b"
 )
 
@@ -470,10 +472,10 @@ NOT_X_JUST_Y = (
 COMPULSIVE_INTRO = (
     r"\b(?:in today['’]?s (?:[\w-]+ ){0,2}(?:world|landscape|environment|market)\b|"
     r"in a world where|in an era of|"
-    r"in recent years,|more than ever before|we live in a (?:time|world) when|"
+    r"more than ever before|we live in a (?:time|world) when|"
     r"(?:great|exciting|big) news[!:]|"
     r"ever (?:wanted|wondered|dreamed|wished) to [^?\n]{3,60}\?|"
-    r"in an increasingly (?:interconnected|digital|competitive|complex) world)\b"
+    r"in an increasingly (?:interconnected|digital|competitive|complex) world)(?!\w)"
 )
 
 ARTICLE_TITLE_NOUN = (
@@ -1725,6 +1727,8 @@ def scan(raw_text: str, syntax: str = "markdown") -> dict:
     text, evasion_defused = defuse_evasion(
         strip_markdown_furniture(strip_quoted_spans(prose))
     )
+    unfolded = text
+    text = text.replace("’", "'")
 
     simple = [
         ("16_ing_tail", ING_TAIL, "Superficial -ing tail clauses"),
@@ -1777,12 +1781,13 @@ def scan(raw_text: str, syntax: str = "markdown") -> dict:
 
     flags_re = re.IGNORECASE
     for key, pattern, label in simple:
-        matches = regex_count(text, pattern, flags_re)
+        src = unfolded if key == "60_curly_quotes" else text
+        matches = regex_count(src, pattern, flags_re)
         if matches:
             result[key] = {
                 "label": label,
                 "count": len(matches),
-                "samples": samples(text, pattern, flags_re),
+                "samples": samples(src, pattern, flags_re),
             }
 
     emojis = EMOJI.findall(text)
