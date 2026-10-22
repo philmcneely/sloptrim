@@ -4,7 +4,7 @@
 process.on('uncaughtException', () => process.exit(0));
 process.on('unhandledRejection', () => process.exit(0));
 const fs = require('fs');
-const { readMode, writeMode, contract, LEVELS, sweepLedgers, FLAG } = require('./sloptrim-lib');
+const { forcedMode, readMode, writeMode, contract, LEVELS, sweepLedgers, FLAG } = require('./sloptrim-lib');
 
 // The mode flag is written the first time this hook runs, so its absence is the
 // only reliable signal that nobody has used this install yet.
@@ -39,7 +39,7 @@ sweepLedgers();
 
 const mode = readMode();
 if (mode === 'off') process.exit(0);
-if (LEVELS.includes(mode)) writeMode(mode);
+if (LEVELS.includes(mode) && !forcedMode()) writeMode(mode);
 // Only greet if the flag really landed; otherwise "shown once" would be a lie.
 if (firstRun && !fs.existsSync(FLAG)) firstRun = false;
 process.stdout.write((firstRun ? WELCOME + '\n' : '') + contract(mode));

@@ -19,7 +19,14 @@ const LEVELS = ['lite', 'full', 'strict'];
 // ------------------------------------------------------------------------
 // MODE: Reading and writing the one-word level flag.
 // ------------------------------------------------------------------------
+function forcedMode() {
+  const v = (process.env.SLOPTRIM_MODE || '').trim();
+  return LEVELS.includes(v) || v === 'off' ? v : null;
+}
+
 function readMode() {
+  const forced = forcedMode();
+  if (forced) return forced;
   try {
     const v = fs.readFileSync(FLAG, 'utf8').trim().slice(0, 16);
     if (v === 'off') return 'off';
@@ -231,4 +238,4 @@ function contract(mode, portable) {
   return lines.join('\n');
 }
 
-module.exports = { CONFIG_DIR, FLAG, LEDGER, ROOT, DETECT, LEVELS, readMode, writeMode, readStdin, parseStdin, runDetect, runDetectResult, contract, verdict, logDeliverable, readLedger, ledgerPath, sweepLedgers };
+module.exports = { CONFIG_DIR, FLAG, LEDGER, ROOT, DETECT, LEVELS, forcedMode, readMode, writeMode, readStdin, parseStdin, runDetect, runDetectResult, contract, verdict, logDeliverable, readLedger, ledgerPath, sweepLedgers };

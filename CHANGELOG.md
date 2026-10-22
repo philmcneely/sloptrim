@@ -4,6 +4,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `SLOPTRIM_MODE` sets the level for one run: `off`, `lite`, `full` or `strict`. It beats the saved level and is never written back. Before this, a headless code job could only skip the prose contract (about 1,100 tokens at session start and 900 per subagent) by disabling the plugin, because the first session saves its level and the saved level always won. With the variable unset, every hook behaves exactly as in 0.9.5.
+
 ## [0.9.5] - 2026-10-22
 
 ### Fixed

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Smoke tests for the plugin hook layer: synthetic hook payloads in, output shape and flag-file state checked.
 set -u
+unset SLOPTRIM_MODE
 topath() { if command -v cygpath >/dev/null 2>&1; then cygpath -m "$1"; else echo "$1"; fi; }
 REPO="$(topath "$(cd "$(dirname "$0")/.." && pwd)")"
 export CLAUDE_CONFIG_DIR="$(topath "$(mktemp -d)")"
@@ -237,6 +238,21 @@ echo "$again" | grep -q "SLOPTRIM ACTIVE - level: full"; check "second session: 
 out="$(echo '{"prompt":"/sloptrim doctor"}' | CLAUDE_CONFIG_DIR="$FRESH" node "$REPO/hooks/sloptrim-tracker.js")"
 echo "$out" | grep -q "python runs the detector"; check "fresh install: doctor reports detector health" $?
 echo "$out" | grep -q "does not prove the host loads or trusts"; check "fresh install: doctor distinguishes local health from hook activation" $?
+
+RUN="$(topath "$(mktemp -d)")"
+echo full > "$RUN/.sloptrim-active"
+out="$(echo '{}' | CLAUDE_CONFIG_DIR="$RUN" SLOPTRIM_MODE=off node "$REPO/hooks/sloptrim-activate.js")"
+[ -z "$out" ]; check "SLOPTRIM_MODE=off silences activate over a saved full flag" $?
+[ "$(cat "$RUN/.sloptrim-active")" = "full" ]; check "SLOPTRIM_MODE=off leaves the saved flag alone" $?
+out="$(echo '{"agent_type":"Explore"}' | CLAUDE_CONFIG_DIR="$RUN" SLOPTRIM_MODE=off node "$REPO/hooks/sloptrim-subagent.js")"
+[ -z "$out" ]; check "SLOPTRIM_MODE=off silences subagent injection" $?
+out="$(echo '{"prompt":"fix the parser"}' | CLAUDE_CONFIG_DIR="$RUN" SLOPTRIM_MODE=off node "$REPO/hooks/sloptrim-tracker.js")"
+[ -z "$out" ]; check "SLOPTRIM_MODE=off silences the per-prompt reminder" $?
+out="$(echo '{}' | CLAUDE_CONFIG_DIR="$RUN" SLOPTRIM_MODE=strict node "$REPO/hooks/sloptrim-activate.js")"
+echo "$out" | grep -q "SLOPTRIM ACTIVE - level: strict"; check "SLOPTRIM_MODE=strict overrides a saved full flag" $?
+[ "$(cat "$RUN/.sloptrim-active")" = "full" ]; check "SLOPTRIM_MODE=strict is not persisted" $?
+out="$(echo '{}' | CLAUDE_CONFIG_DIR="$RUN" SLOPTRIM_MODE=bogus node "$REPO/hooks/sloptrim-activate.js")"
+echo "$out" | grep -q "SLOPTRIM ACTIVE - level: full"; check "an unknown SLOPTRIM_MODE falls back to the saved flag" $?
 
 node "$REPO/tests/interp.js" >/dev/null 2>&1
 check "a failing first python falls through to the next launcher" $?
